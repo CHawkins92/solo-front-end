@@ -49,24 +49,6 @@ function Create() {
     { key: "Other", value: "Other", text: "Other" },
   ];
 
-  // const handleSubmit = () => {
-  //   validatePrefix(prefix);
-
-  //   if (messages.length === 0) {
-  //     console.log("proceed with api call");
-  //   } else {
-  //     console.log("Do not proceed");
-  //   }
-  // };
-
-  const validatePrefix = (prefix) => {
-    let errMsg = "Prefix is a required field";
-    if (!prefix) {
-      console.log(errMsg);
-      return errMsg;
-    }
-  };
-
   const callMockAPI = () => {
     const formData = {
       prefix,
@@ -93,6 +75,76 @@ function Create() {
       .post(endpointURL, formData)
       .then((response) => console.log(response.data))
       .catch((err) => console.log(err));
+  };
+
+  const handleSubmit = (event) => {
+    event.preventDefault();
+    let errMsgs = [];
+
+    errMsgs = validatePrefix(prefix, errMsgs);
+    errMsgs = validateFirstName(firstName, errMsgs);
+    errMsgs = validateLastName(lastName, errMsgs);
+    errMsgs = validateTelephoneNumber(telephoneNumber, errMsgs);
+
+    if (errMsgs.length > 0) {
+      alert(errMsgs.join("\n"));
+    } else {
+      callMockAPI();
+    }
+  };
+
+  const validatePrefix = (prefix, errMsgs) => {
+    const errText = "Prefix is a required field";
+
+    if (prefix == "" || prefix == null || prefix == undefined) {
+      errMsgs.push(errText);
+      return errMsgs;
+    }
+
+    return errMsgs;
+  };
+
+  const validateFirstName = (firstName, errMsgs) => {
+    const errText = "First name is a required field";
+
+    if (firstName == "" || firstName == null || firstName == undefined) {
+      errMsgs.push(errText);
+      return errMsgs;
+    }
+
+    return errMsgs;
+  };
+
+  const validateLastName = (lastName, errMsgs) => {
+    const errText = "Last name is a required field";
+
+    if (lastName == "" || lastName == null || lastName == undefined) {
+      errMsgs.push(errText);
+      return errMsgs;
+    }
+
+    return errMsgs;
+  };
+
+  const validateTelephoneNumber = (telephoneNumber, errMsgs) => {
+    const errText1 = "Telephone number is a required field";
+    const errText2 = "Telephone number should be 11 digits long";
+
+    if (
+      telephoneNumber == "" ||
+      telephoneNumber == null ||
+      telephoneNumber == undefined
+    ) {
+      errMsgs.push(errText1);
+      return errMsgs;
+    }
+
+    if (telephoneNumber.length < 11 || telephoneNumber.length > 11) {
+      errMsgs.push(errText2);
+      return errMsgs;
+    }
+
+    return errMsgs;
   };
 
   return (
@@ -244,7 +296,7 @@ function Create() {
             onChange={(e) => setVehDateRegistered(e.target.value)}
           />
         </Form.Field>
-        <Button type="submit" onClick={callMockAPI}>
+        <Button type="submit" onClick={handleSubmit}>
           Submit
         </Button>
       </Form>
