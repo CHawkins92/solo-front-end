@@ -20,9 +20,9 @@ function Create() {
   const [vehCurrentValue, setVehCurrentValue] = useState("");
   const [vehDateRegistered, setVehDateRegistered] = useState("");
 
-  // errors
-  const [messages, setMessages] = useState([]);
-  const errMsgsElement = document.getElementById("errMessages");
+  const [fieldErrors, setFieldErrors] = useState({
+    prefix: false,
+  });
 
   // Options for drop downs
   const prefixOptions = [
@@ -85,6 +85,16 @@ function Create() {
     errMsgs = validateFirstName(firstName, errMsgs);
     errMsgs = validateLastName(lastName, errMsgs);
     errMsgs = validateTelephoneNumber(telephoneNumber, errMsgs);
+    errMsgs = validateAddressLine1(addressLine1, errMsgs);
+    errMsgs = validateCity(city, errMsgs);
+    errMsgs = validatePostcode(postcode, errMsgs);
+    errMsgs = validateVehicleType(vehicleType, errMsgs);
+    errMsgs = validateEngineSize(engineSize, errMsgs);
+    errMsgs = validateAdditionalDrivers(addDrivers, errMsgs);
+    errMsgs = validateCommercialUse(commercialUse, errMsgs);
+    errMsgs = validateRegisteredStateUse(regStateUse, errMsgs);
+    errMsgs = validateVehicleCurrentValue(vehCurrentValue, errMsgs);
+    errMsgs = validateDateRegistered(vehDateRegistered, errMsgs);
 
     if (errMsgs.length > 0) {
       alert(errMsgs.join("\n"));
@@ -96,18 +106,22 @@ function Create() {
   const validatePrefix = (prefix, errMsgs) => {
     const errText = "Prefix is a required field";
 
-    if (prefix == "" || prefix == null || prefix == undefined) {
+    if (prefix === "" || prefix === null || prefix === undefined) {
       errMsgs.push(errText);
+      fieldErrors.prefix = true;
+      setFieldErrors({ ...fieldErrors });
       return errMsgs;
     }
 
+    fieldErrors.prefix = false;
+    setFieldErrors({ ...fieldErrors });
     return errMsgs;
   };
 
   const validateFirstName = (firstName, errMsgs) => {
     const errText = "First name is a required field";
 
-    if (firstName == "" || firstName == null || firstName == undefined) {
+    if (firstName === "" || firstName === null || firstName === undefined) {
       errMsgs.push(errText);
       return errMsgs;
     }
@@ -118,7 +132,7 @@ function Create() {
   const validateLastName = (lastName, errMsgs) => {
     const errText = "Last name is a required field";
 
-    if (lastName == "" || lastName == null || lastName == undefined) {
+    if (lastName === "" || lastName === null || lastName === undefined) {
       errMsgs.push(errText);
       return errMsgs;
     }
@@ -131,9 +145,9 @@ function Create() {
     const errText2 = "Telephone number should be 11 digits long";
 
     if (
-      telephoneNumber == "" ||
-      telephoneNumber == null ||
-      telephoneNumber == undefined
+      telephoneNumber === "" ||
+      telephoneNumber === null ||
+      telephoneNumber === undefined
     ) {
       errMsgs.push(errText1);
       return errMsgs;
@@ -147,9 +161,142 @@ function Create() {
     return errMsgs;
   };
 
+  const validateAddressLine1 = (addressLine1, errMsgs) => {
+    const errText = "Address line 1 is a required field";
+
+    if (
+      addressLine1 === "" ||
+      addressLine1 === null ||
+      addressLine1 === undefined
+    ) {
+      errMsgs.push(errText);
+      return errMsgs;
+    }
+
+    return errMsgs;
+  };
+
+  const validateCity = (city, errMsgs) => {
+    const errText = "City is a required field";
+
+    if (city === "" || city === null || city === undefined) {
+      errMsgs.push(errText);
+      return errMsgs;
+    }
+
+    return errMsgs;
+  };
+
+  const validatePostcode = (postcode, errMsgs) => {
+    const errText = "Postcode is a required field";
+
+    if (postcode === "" || postcode === null || postcode === undefined) {
+      errMsgs.push(errText);
+      return errMsgs;
+    }
+
+    return errMsgs;
+  };
+
+  const validateVehicleType = (vehicleType, errMsgs) => {
+    const errText = "Vehicle type is a required field";
+
+    if (
+      vehicleType === "" ||
+      vehicleType === null ||
+      vehicleType === undefined
+    ) {
+      errMsgs.push(errText);
+      return errMsgs;
+    }
+
+    return errMsgs;
+  };
+
+  const validateEngineSize = (engineSize, errMsgs) => {
+    const errText = "Engine size is a required field";
+
+    if (engineSize === "" || engineSize === null || engineSize === undefined) {
+      errMsgs.push(errText);
+      return errMsgs;
+    }
+
+    return errMsgs;
+  };
+
+  const validateAdditionalDrivers = (addDrivers, errMsgs) => {
+    const errText = "Additional drivers is a required field";
+
+    if (addDrivers === "" || addDrivers === null || addDrivers === undefined) {
+      errMsgs.push(errText);
+      return errMsgs;
+    }
+
+    return errMsgs;
+  };
+
+  const validateCommercialUse = (commercialUse, errMsgs) => {
+    const errText = "Commercial use is a required field";
+
+    if (
+      commercialUse === "" ||
+      commercialUse === null ||
+      commercialUse === undefined
+    ) {
+      errMsgs.push(errText);
+      return errMsgs;
+    }
+
+    return errMsgs;
+  };
+
+  const validateRegisteredStateUse = (regStateUse, errMsgs) => {
+    const errText = "Registered state use is a required field";
+
+    if (
+      regStateUse === "" ||
+      regStateUse === null ||
+      regStateUse === undefined
+    ) {
+      errMsgs.push(errText);
+      return errMsgs;
+    }
+
+    return errMsgs;
+  };
+
+  const validateVehicleCurrentValue = (vehCurrentValue, errMsgs) => {
+    const errText = "Vehicle current value is a required field";
+
+    if (
+      vehCurrentValue === "" ||
+      vehCurrentValue === null ||
+      vehCurrentValue === undefined
+    ) {
+      errMsgs.push(errText);
+      return errMsgs;
+    }
+
+    return errMsgs;
+  };
+
+  const validateDateRegistered = (vehDateRegistered, errMsgs) => {
+    const errText = "Date registered is a required field";
+
+    if (
+      vehDateRegistered === "" ||
+      vehDateRegistered === null ||
+      vehDateRegistered === undefined
+    ) {
+      errMsgs.push(errText);
+      return errMsgs;
+    }
+
+    return errMsgs;
+  };
+
   return (
     <div>
-      <div id="errMessages"></div>
       <Form>
         <Form.Field>
           <label>Prefix</label>
@@ -158,6 +305,7 @@ function Create() {
             options={prefixOptions}
             onChange={(e, { value }) => setPrefix(value)}
             value={prefix}
+            error={fieldErrors.prefix}
           />
         </Form.Field>
         <Form.Field>

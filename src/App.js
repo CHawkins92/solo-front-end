@@ -1,8 +1,5 @@
 import "./App.css";
 import Create from "./components/Create/Create";
-import Read from "./components/Read/Read";
-import Update from "./components/Update/Update";
-import Delete from "./components/Delete/Delete";
 import Admin from "./components/Admin/Admin";
 import "semantic-ui-css/semantic.min.css";
 import { BrowserRouter, Route } from "react-router-dom";
@@ -16,12 +13,6 @@ function App() {
         </div>
         <div>
           <Route exact path="/" component={Create} />
-        </div>
-        <div style={{ marginTop: 25 }}>
-          <Route exact path="/read" component={Read} />
-        </div>
-        <div>
-          <Route path="/update" component={Update} />
         </div>
         <div>
           <Route exact path="/admin" component={Admin} />
