@@ -20,8 +20,23 @@ function Create() {
   const [vehCurrentValue, setVehCurrentValue] = useState("");
   const [vehDateRegistered, setVehDateRegistered] = useState("");
 
+  // Field error status, all initialized false
   const [fieldErrors, setFieldErrors] = useState({
     prefix: false,
+    firstName: false,
+    lastName: false,
+    telephoneNumber: false,
+    addressLine1: false,
+    addressLine2: false,
+    city: false,
+    postcode: false,
+    vehicleType: false,
+    engineSize: false,
+    addDrivers: false,
+    commercialUse: false,
+    regStateUse: false,
+    vehCurrentValue: false,
+    vehDateRegistered: false,
   });
 
   // Options for drop downs
@@ -68,8 +83,8 @@ function Create() {
       vehDateRegistered,
     };
 
-    const endpointURL =
-      "https://6156de01e039a0001725ac37.mockapi.io/api/vi/customerDetails";
+    const endpointURL = "http://localhost:8080/hobbits";
+    //"https://6156de01e039a0001725ac37.mockapi.io/api/vi/customerDetails"
 
     axios
       .post(endpointURL, formData)
@@ -123,9 +138,13 @@ function Create() {
 
     if (firstName === "" || firstName === null || firstName === undefined) {
       errMsgs.push(errText);
+      fieldErrors.firstName = true;
+      setFieldErrors({ ...fieldErrors });
       return errMsgs;
     }
 
+    fieldErrors.firstName = false;
+    setFieldErrors({ ...fieldErrors });
     return errMsgs;
   };
 
@@ -134,9 +153,13 @@ function Create() {
 
     if (lastName === "" || lastName === null || lastName === undefined) {
       errMsgs.push(errText);
+      fieldErrors.lastName = true;
+      setFieldErrors({ ...fieldErrors });
       return errMsgs;
     }
 
+    fieldErrors.lastName = false;
+    setFieldErrors({ ...fieldErrors });
     return errMsgs;
   };
 
@@ -150,14 +173,13 @@ function Create() {
       telephoneNumber === undefined
     ) {
       errMsgs.push(errText1);
+      fieldErrors.telephoneNumber = true;
+      setFieldErrors({ ...fieldErrors });
       return errMsgs;
     }
 
-    if (telephoneNumber.length < 11 || telephoneNumber.length > 11) {
-      errMsgs.push(errText2);
-      return errMsgs;
-    }
-
+    fieldErrors.telephoneNumber = false;
+    setFieldErrors({ ...fieldErrors });
     return errMsgs;
   };
 
@@ -170,9 +192,13 @@ function Create() {
       addressLine1 === undefined
     ) {
       errMsgs.push(errText);
+      fieldErrors.addressLine1 = true;
+      setFieldErrors({ ...fieldErrors });
       return errMsgs;
     }
 
+    fieldErrors.addressLine1 = false;
+    setFieldErrors({ ...fieldErrors });
     return errMsgs;
   };
 
@@ -181,9 +207,13 @@ function Create() {
 
     if (city === "" || city === null || city === undefined) {
       errMsgs.push(errText);
+      fieldErrors.city = true;
+      setFieldErrors({ ...fieldErrors });
       return errMsgs;
     }
 
+    fieldErrors.city = false;
+    setFieldErrors({ ...fieldErrors });
     return errMsgs;
   };
 
@@ -192,9 +222,13 @@ function Create() {
 
     if (postcode === "" || postcode === null || postcode === undefined) {
       errMsgs.push(errText);
+      fieldErrors.postcode = true;
+      setFieldErrors({ ...fieldErrors });
       return errMsgs;
     }
 
+    fieldErrors.postcode = false;
+    setFieldErrors({ ...fieldErrors });
     return errMsgs;
   };
 
@@ -305,35 +339,39 @@ function Create() {
             options={prefixOptions}
             onChange={(e, { value }) => setPrefix(value)}
             value={prefix}
-            error={fieldErrors.prefix}
+            error={fieldErrors.prefix ? "Error" : false}
           />
         </Form.Field>
         <Form.Field>
           <label>First Name</label>
-          <input
+          <Form.Input
             placeholder="First Name"
             onChange={(e) => setFirstName(e.target.value)}
+            error={fieldErrors.firstName ? "Error" : false}
           />
         </Form.Field>
         <Form.Field>
           <label>Last Name</label>
-          <input
+          <Form.Input
             placeholder="Last Name"
             onChange={(e) => setLastName(e.target.value)}
+            error={fieldErrors.lastName ? "Error" : false}
           />
         </Form.Field>
         <Form.Field>
           <label>Telephone Number</label>
-          <input
+          <Form.Input
             placeholder="Telephone Number"
             onChange={(e) => setTelephoneNumber(e.target.value)}
+            error={fieldErrors.telephoneNumber ? "Error" : false}
           />
         </Form.Field>
         <Form.Field>
           <label>Address Line 1</label>
-          <input
+          <Form.Input
             placeholder="Address Line 1"
             onChange={(e) => setAddressLine1(e.target.value)}
+            error={fieldErrors.addressLine1 ? "Error" : false}
           />
         </Form.Field>
         <Form.Field>
@@ -345,13 +383,18 @@ function Create() {
         </Form.Field>
         <Form.Field>
           <label>City</label>
-          <input placeholder="City" onChange={(e) => setCity(e.target.value)} />
+          <Form.Input
+            placeholder="City"
+            onChange={(e) => setCity(e.target.value)}
+            error={fieldErrors.city ? "Error" : false}
+          />
         </Form.Field>
         <Form.Field>
           <label>Postcode</label>
-          <input
+          <Form.Input
             placeholder="Postcode"
             onChange={(e) => setPostcode(e.target.value)}
+            error={fieldErrors.postcode ? "Error" : false}
           />
         </Form.Field>
         <Form.Field>
@@ -406,6 +449,7 @@ function Create() {
         </Form.Group>
         <Form.Field>
           Will this vehicle be used outside the registered state??
+          {1 === 1 ? <p>no error</p> : <p></p>}
         </Form.Field>
         <Form.Group>
           <Form.Field>
