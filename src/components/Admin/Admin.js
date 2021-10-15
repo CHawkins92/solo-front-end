@@ -11,9 +11,9 @@ function Admin() {
   const [customerData, setCustomerData] = useState(null);
 
   function callMockAPIWithAxiosGET() {
-    const endpointURL =
-      "https://6156de01e039a0001725ac37.mockapi.io/api/vi/customerDetails/" +
-      idToGet;
+    const endpointURL = "http://localhost:8080/customerDetails?id=" + idToGet;
+    // "https://6156de01e039a0001725ac37.mockapi.io/api/vi/customerDetails/" +
+    // idToGet;
 
     axios
       .get(endpointURL)

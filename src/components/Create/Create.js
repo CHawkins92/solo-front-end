@@ -63,8 +63,8 @@ function Create() {
       vehDateRegistered,
     };
 
-    const endpointURL =
-      "https://6156de01e039a0001725ac37.mockapi.io/api/vi/customerDetails";
+    const endpointURL = "http://localhost:8080/customerDetails";
+    //"https://6156de01e039a0001725ac37.mockapi.io/api/vi/customerDetails";
 
     axios
       .post(endpointURL, formData)
