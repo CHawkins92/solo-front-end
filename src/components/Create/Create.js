@@ -1,6 +1,9 @@
-import React, { useState } from "react";
-import { Button, Form, Radio } from "semantic-ui-react";
+import React, { useState, useEffect } from "react";
+import { Button, Form, Divider, Segment, Image } from "semantic-ui-react";
 import axios from "axios";
+import * as ErrorMsgConstants from "./ErrorMessages.js";
+import * as DropDownOptions from "./DropdownOptions";
+import logo from "./allstate_logo.jpg";
 
 function Create() {
   // Properties mapping to form fields
@@ -15,8 +18,8 @@ function Create() {
   const [vehicleType, setVehicleType] = useState("");
   const [engineSize, setEngineSize] = useState("");
   const [addDrivers, setAddDrivers] = useState("");
-  const [commercialUse, setCommercialUse] = useState("");
-  const [regStateUse, setRegStateUse] = useState("");
+  const [commercialUse, setCommercialUse] = useState("No");
+  const [regStateUse, setRegStateUse] = useState("No");
   const [vehCurrentValue, setVehCurrentValue] = useState("");
   const [vehDateRegistered, setVehDateRegistered] = useState("");
 
@@ -25,9 +28,11 @@ function Create() {
     prefix: false,
     firstName: false,
     lastName: false,
-    telephoneNumber: false,
+    telephoneNumber: {
+      missing: false,
+      invalid: false,
+    },
     addressLine1: false,
-    addressLine2: false,
     city: false,
     postcode: false,
     vehicleType: false,
@@ -38,31 +43,6 @@ function Create() {
     vehCurrentValue: false,
     vehDateRegistered: false,
   });
-
-  // Options for drop downs
-  const prefixOptions = [
-    { key: "Mr", value: "Mr", text: "Mr" },
-    { key: "Mrs", value: "Mrs", text: "Mrs" },
-    { key: "Miss", value: "Miss", text: "Miss" },
-    { key: "Ms", value: "Ms", text: "Ms" },
-  ];
-
-  const vehTypeOptions = [
-    { key: "Cabriolet", value: "Cabriolet", text: "Cabriolet" },
-    { key: "Coupe", value: "Coupe", text: "Coupe" },
-    { key: "Estate", value: "Estate", text: "Estate" },
-    { key: "Hatchback", value: "Hatchback", text: "Hatchback" },
-    { key: "Other", value: "Other", text: "Other" },
-  ];
-
-  const engSizeOptions = [
-    { key: "1000", value: "1000", text: "1000" },
-    { key: "1600", value: "1600", text: "1600" },
-    { key: "2000", value: "2000", text: "2000" },
-    { key: "2500", value: "2500", text: "2500" },
-    { key: "3000", value: "3000", text: "3000" },
-    { key: "Other", value: "Other", text: "Other" },
-  ];
 
   const callMockAPI = () => {
     const formData = {
@@ -83,8 +63,8 @@ function Create() {
       vehDateRegistered,
     };
 
-    const endpointURL = "http://localhost:8080/hobbits";
-    //"https://6156de01e039a0001725ac37.mockapi.io/api/vi/customerDetails"
+    const endpointURL =
+      "https://6156de01e039a0001725ac37.mockapi.io/api/vi/customerDetails";
 
     axios
       .post(endpointURL, formData)
@@ -94,403 +74,429 @@ function Create() {
 
   const handleSubmit = (event) => {
     event.preventDefault();
-    let errMsgs = [];
 
-    errMsgs = validatePrefix(prefix, errMsgs);
-    errMsgs = validateFirstName(firstName, errMsgs);
-    errMsgs = validateLastName(lastName, errMsgs);
-    errMsgs = validateTelephoneNumber(telephoneNumber, errMsgs);
-    errMsgs = validateAddressLine1(addressLine1, errMsgs);
-    errMsgs = validateCity(city, errMsgs);
-    errMsgs = validatePostcode(postcode, errMsgs);
-    errMsgs = validateVehicleType(vehicleType, errMsgs);
-    errMsgs = validateEngineSize(engineSize, errMsgs);
-    errMsgs = validateAdditionalDrivers(addDrivers, errMsgs);
-    errMsgs = validateCommercialUse(commercialUse, errMsgs);
-    errMsgs = validateRegisteredStateUse(regStateUse, errMsgs);
-    errMsgs = validateVehicleCurrentValue(vehCurrentValue, errMsgs);
-    errMsgs = validateDateRegistered(vehDateRegistered, errMsgs);
+    let formValidFlag = true;
 
-    if (errMsgs.length > 0) {
-      alert(errMsgs.join("\n"));
-    } else {
+    formValidFlag = validatePrefix(prefix);
+    formValidFlag = validateFirstName(firstName);
+    formValidFlag = validateLastName(lastName);
+    formValidFlag = validateTelephoneNumber(telephoneNumber);
+    formValidFlag = validateAddressLine1(addressLine1);
+    formValidFlag = validateCity(city);
+    formValidFlag = validatePostcode(postcode);
+    formValidFlag = validateVehicleType(vehicleType);
+    formValidFlag = validateEngineSize(engineSize);
+    formValidFlag = validateAdditionalDrivers(addDrivers);
+    formValidFlag = validateVehicleCurrentValue(vehCurrentValue);
+    formValidFlag = validateDateRegistered(vehDateRegistered);
+
+    if (formValidFlag) {
       callMockAPI();
+    } else {
+      alert("Errors present");
     }
   };
 
-  const validatePrefix = (prefix, errMsgs) => {
-    const errText = "Prefix is a required field";
-
+  const validatePrefix = (prefix) => {
     if (prefix === "" || prefix === null || prefix === undefined) {
-      errMsgs.push(errText);
       fieldErrors.prefix = true;
       setFieldErrors({ ...fieldErrors });
-      return errMsgs;
+      return false;
     }
 
     fieldErrors.prefix = false;
     setFieldErrors({ ...fieldErrors });
-    return errMsgs;
+    return true;
   };
 
-  const validateFirstName = (firstName, errMsgs) => {
-    const errText = "First name is a required field";
-
+  const validateFirstName = (firstName) => {
     if (firstName === "" || firstName === null || firstName === undefined) {
-      errMsgs.push(errText);
       fieldErrors.firstName = true;
       setFieldErrors({ ...fieldErrors });
-      return errMsgs;
+      return false;
     }
 
     fieldErrors.firstName = false;
     setFieldErrors({ ...fieldErrors });
-    return errMsgs;
+    return true;
   };
 
-  const validateLastName = (lastName, errMsgs) => {
-    const errText = "Last name is a required field";
-
+  const validateLastName = (lastName) => {
     if (lastName === "" || lastName === null || lastName === undefined) {
-      errMsgs.push(errText);
       fieldErrors.lastName = true;
       setFieldErrors({ ...fieldErrors });
-      return errMsgs;
+      return false;
     }
 
     fieldErrors.lastName = false;
     setFieldErrors({ ...fieldErrors });
-    return errMsgs;
+    return true;
   };
 
-  const validateTelephoneNumber = (telephoneNumber, errMsgs) => {
-    const errText1 = "Telephone number is a required field";
-    const errText2 = "Telephone number should be 11 digits long";
-
+  const validateTelephoneNumber = (telephoneNumber) => {
     if (
       telephoneNumber === "" ||
       telephoneNumber === null ||
       telephoneNumber === undefined
     ) {
-      errMsgs.push(errText1);
-      fieldErrors.telephoneNumber = true;
+      fieldErrors.telephoneNumber.missing = true;
       setFieldErrors({ ...fieldErrors });
-      return errMsgs;
+      return false;
     }
 
-    fieldErrors.telephoneNumber = false;
+    if (telephoneNumber.length < 10) {
+      fieldErrors.telephoneNumber.missing = false;
+      fieldErrors.telephoneNumber.invalid = true;
+      setFieldErrors({ ...fieldErrors });
+      return false;
+    }
+
+    fieldErrors.telephoneNumber.missing = false;
+    fieldErrors.telephoneNumber.invalid = false;
     setFieldErrors({ ...fieldErrors });
-    return errMsgs;
+    return true;
   };
 
-  const validateAddressLine1 = (addressLine1, errMsgs) => {
-    const errText = "Address line 1 is a required field";
-
+  const validateAddressLine1 = (addressLine1) => {
     if (
       addressLine1 === "" ||
       addressLine1 === null ||
       addressLine1 === undefined
     ) {
-      errMsgs.push(errText);
       fieldErrors.addressLine1 = true;
       setFieldErrors({ ...fieldErrors });
-      return errMsgs;
+      return false;
     }
 
     fieldErrors.addressLine1 = false;
     setFieldErrors({ ...fieldErrors });
-    return errMsgs;
+    return true;
   };
 
-  const validateCity = (city, errMsgs) => {
-    const errText = "City is a required field";
-
+  const validateCity = (city) => {
     if (city === "" || city === null || city === undefined) {
-      errMsgs.push(errText);
       fieldErrors.city = true;
       setFieldErrors({ ...fieldErrors });
-      return errMsgs;
+      return false;
     }
 
     fieldErrors.city = false;
     setFieldErrors({ ...fieldErrors });
-    return errMsgs;
+    return true;
   };
 
-  const validatePostcode = (postcode, errMsgs) => {
-    const errText = "Postcode is a required field";
-
+  const validatePostcode = (postcode) => {
     if (postcode === "" || postcode === null || postcode === undefined) {
-      errMsgs.push(errText);
       fieldErrors.postcode = true;
       setFieldErrors({ ...fieldErrors });
-      return errMsgs;
+      return false;
     }
 
     fieldErrors.postcode = false;
     setFieldErrors({ ...fieldErrors });
-    return errMsgs;
+    return true;
   };
 
-  const validateVehicleType = (vehicleType, errMsgs) => {
-    const errText = "Vehicle type is a required field";
-
+  const validateVehicleType = (vehicleType) => {
     if (
       vehicleType === "" ||
       vehicleType === null ||
       vehicleType === undefined
     ) {
-      errMsgs.push(errText);
-      return errMsgs;
+      fieldErrors.vehicleType = true;
+      setFieldErrors({ ...fieldErrors });
+      return false;
     }
 
-    return errMsgs;
+    fieldErrors.vehicleType = false;
+    setFieldErrors({ ...fieldErrors });
+    return true;
   };
 
-  const validateEngineSize = (engineSize, errMsgs) => {
-    const errText = "Engine size is a required field";
-
+  const validateEngineSize = (engineSize) => {
     if (engineSize === "" || engineSize === null || engineSize === undefined) {
-      errMsgs.push(errText);
-      return errMsgs;
+      fieldErrors.engineSize = true;
+      setFieldErrors({ ...fieldErrors });
+      return false;
     }
 
-    return errMsgs;
+    fieldErrors.engineSize = false;
+    setFieldErrors({ ...fieldErrors });
+    return true;
   };
 
-  const validateAdditionalDrivers = (addDrivers, errMsgs) => {
-    const errText = "Additional drivers is a required field";
-
+  const validateAdditionalDrivers = (addDrivers) => {
     if (addDrivers === "" || addDrivers === null || addDrivers === undefined) {
-      errMsgs.push(errText);
-      return errMsgs;
+      fieldErrors.addDrivers = true;
+      setFieldErrors({ ...fieldErrors });
+      return false;
     }
 
-    return errMsgs;
+    fieldErrors.addDrivers = false;
+    setFieldErrors({ ...fieldErrors });
+    return true;
   };
 
-  const validateCommercialUse = (commercialUse, errMsgs) => {
-    const errText = "Commercial use is a required field";
-
-    if (
-      commercialUse === "" ||
-      commercialUse === null ||
-      commercialUse === undefined
-    ) {
-      errMsgs.push(errText);
-      return errMsgs;
-    }
-
-    return errMsgs;
-  };
-
-  const validateRegisteredStateUse = (regStateUse, errMsgs) => {
-    const errText = "Registered state use is a required field";
-
-    if (
-      regStateUse === "" ||
-      regStateUse === null ||
-      regStateUse === undefined
-    ) {
-      errMsgs.push(errText);
-      return errMsgs;
-    }
-
-    return errMsgs;
-  };
-
-  const validateVehicleCurrentValue = (vehCurrentValue, errMsgs) => {
-    const errText = "Vehicle current value is a required field";
-
+  const validateVehicleCurrentValue = (vehCurrentValue) => {
     if (
       vehCurrentValue === "" ||
       vehCurrentValue === null ||
       vehCurrentValue === undefined
     ) {
-      errMsgs.push(errText);
-      return errMsgs;
+      fieldErrors.vehCurrentValue = true;
+      setFieldErrors({ ...fieldErrors });
+      return false;
     }
 
-    return errMsgs;
+    fieldErrors.vehCurrentValue = false;
+    setFieldErrors({ ...fieldErrors });
+    return true;
   };
 
-  const validateDateRegistered = (vehDateRegistered, errMsgs) => {
-    const errText = "Date registered is a required field";
-
+  const validateDateRegistered = (vehDateRegistered) => {
     if (
       vehDateRegistered === "" ||
       vehDateRegistered === null ||
       vehDateRegistered === undefined
     ) {
-      errMsgs.push(errText);
-      return errMsgs;
+      fieldErrors.vehDateRegistered = true;
+      setFieldErrors({ ...fieldErrors });
+      return false;
     }
 
-    return errMsgs;
+    fieldErrors.vehDateRegistered = false;
+    setFieldErrors({ ...fieldErrors });
+    return true;
+  };
+
+  const handleCommercialUseChange = (value) => {
+    if (value) {
+      setCommercialUse("Yes");
+    } else {
+      setCommercialUse("No");
+    }
+  };
+
+  const handleRegStateUseChange = (value) => {
+    if (value) {
+      setRegStateUse("Yes");
+    } else {
+      setRegStateUse("No");
+    }
   };
 
   return (
     <div>
-      <Form>
-        <Form.Field>
-          <label>Prefix</label>
-          <Form.Select
-            placeholder="Please Select"
-            options={prefixOptions}
-            onChange={(e, { value }) => setPrefix(value)}
-            value={prefix}
-            error={fieldErrors.prefix ? "Error" : false}
-          />
-        </Form.Field>
-        <Form.Field>
-          <label>First Name</label>
-          <Form.Input
-            placeholder="First Name"
-            onChange={(e) => setFirstName(e.target.value)}
-            error={fieldErrors.firstName ? "Error" : false}
-          />
-        </Form.Field>
-        <Form.Field>
-          <label>Last Name</label>
-          <Form.Input
-            placeholder="Last Name"
-            onChange={(e) => setLastName(e.target.value)}
-            error={fieldErrors.lastName ? "Error" : false}
-          />
-        </Form.Field>
-        <Form.Field>
-          <label>Telephone Number</label>
-          <Form.Input
-            placeholder="Telephone Number"
-            onChange={(e) => setTelephoneNumber(e.target.value)}
-            error={fieldErrors.telephoneNumber ? "Error" : false}
-          />
-        </Form.Field>
-        <Form.Field>
-          <label>Address Line 1</label>
-          <Form.Input
-            placeholder="Address Line 1"
-            onChange={(e) => setAddressLine1(e.target.value)}
-            error={fieldErrors.addressLine1 ? "Error" : false}
-          />
-        </Form.Field>
-        <Form.Field>
-          <label>Address Line 2</label>
-          <input
-            placeholder="Address Line 2"
-            onChange={(e) => setAddressLine2(e.target.value)}
-          />
-        </Form.Field>
-        <Form.Field>
-          <label>City</label>
-          <Form.Input
-            placeholder="City"
-            onChange={(e) => setCity(e.target.value)}
-            error={fieldErrors.city ? "Error" : false}
-          />
-        </Form.Field>
-        <Form.Field>
-          <label>Postcode</label>
-          <Form.Input
-            placeholder="Postcode"
-            onChange={(e) => setPostcode(e.target.value)}
-            error={fieldErrors.postcode ? "Error" : false}
-          />
-        </Form.Field>
-        <Form.Field>
-          <label>Vehicle type</label>
-          <Form.Select
-            placeholder="Please Select"
-            options={vehTypeOptions}
-            onChange={(e, { value }) => setVehicleType(value)}
-            value={vehicleType}
-          />
-        </Form.Field>
-        <Form.Field>
-          <label>Engine size</label>
-          <Form.Select
-            placeholder="Please Select"
-            options={engSizeOptions}
-            onChange={(e, { value }) => setEngineSize(value)}
-            value={engineSize}
-          />
-        </Form.Field>
-        <Form.Field>
-          <label>Additional Drivers</label>
-          <input
-            type="number"
-            min="0"
-            placeholder="Additional Drivers"
-            onChange={(e) => setAddDrivers(e.target.value)}
-          />
-        </Form.Field>
-        <Form.Field>
-          Will this vehicle be used for commercial purposes?
-        </Form.Field>
-        <Form.Group>
+      <Form className="main-form">
+        {/* <div>
+          <Image src={logo} className="center" />
+        </div> */}
+        <Segment color="blue">
+          <Image src={logo} style={{ width: "960px", height: "300px" }} />
+          <Divider horizontal>
+            <b>Your Details</b>
+          </Divider>
+          <Form.Group widths="equal">
+            <Form.Field>
+              <label>Prefix</label>
+              <Form.Select
+                placeholder="Please Select"
+                options={DropDownOptions.prefixOptions}
+                onChange={(e, { value }) => setPrefix(value)}
+                value={prefix}
+                error={
+                  fieldErrors.prefix ? ErrorMsgConstants.PREFIX_REQUIRED : false
+                }
+              />
+            </Form.Field>
+            <Form.Field>
+              <label>First Name</label>
+              <Form.Input
+                placeholder="First Name"
+                onChange={(e) => setFirstName(e.target.value)}
+                error={
+                  fieldErrors.firstName
+                    ? ErrorMsgConstants.FIRST_NAME_REQUIRED
+                    : false
+                }
+              />
+            </Form.Field>
+            <Form.Field>
+              <label>Last Name</label>
+              <Form.Input
+                placeholder="Last Name"
+                onChange={(e) => setLastName(e.target.value)}
+                error={
+                  fieldErrors.lastName
+                    ? ErrorMsgConstants.LAST_NAME_REQUIRED
+                    : false
+                }
+              />
+            </Form.Field>
+          </Form.Group>
           <Form.Field>
-            <Radio
-              label="Yes"
-              name="radioGroupComUse"
-              value="Yes"
-              checked={commercialUse === "Yes"}
-              onChange={(e, { value }) => setCommercialUse(value)}
+            <label>Telephone Number</label>
+            <Form.Input
+              placeholder="Telephone Number"
+              onChange={(e) => setTelephoneNumber(e.target.value)}
+              error={
+                fieldErrors.telephoneNumber.missing
+                  ? ErrorMsgConstants.TELEPHONE_NUMBER_REQUIRED
+                  : fieldErrors.telephoneNumber.invalid
+                  ? ErrorMsgConstants.TELEPHONE_NUMBER_INVALID
+                  : false
+              }
             />
           </Form.Field>
           <Form.Field>
-            <Radio
-              label="No"
-              name="radioGroupComUse"
-              value="No"
-              checked={commercialUse === "No"}
-              onChange={(e, { value }) => setCommercialUse(value)}
-            />
-          </Form.Field>
-        </Form.Group>
-        <Form.Field>
-          Will this vehicle be used outside the registered state??
-          {1 === 1 ? <p>no error</p> : <p></p>}
-        </Form.Field>
-        <Form.Group>
-          <Form.Field>
-            <Radio
-              label="Yes"
-              name="radioGroupRegState"
-              value="Yes"
-              checked={regStateUse === "Yes"}
-              onChange={(e, { value }) => setRegStateUse(value)}
+            <label>Address Line 1</label>
+            <Form.Input
+              placeholder="Address Line 1"
+              onChange={(e) => setAddressLine1(e.target.value)}
+              error={
+                fieldErrors.addressLine1
+                  ? ErrorMsgConstants.ADDRESS_LINE_1_REQUIRED
+                  : false
+              }
             />
           </Form.Field>
           <Form.Field>
-            <Radio
-              label="No"
-              name="radioGroupRegState"
-              value="No"
-              checked={regStateUse === "No"}
-              onChange={(e, { value }) => setRegStateUse(value)}
+            <label>Address Line 2</label>
+            <input
+              placeholder="Address Line 2"
+              onChange={(e) => setAddressLine2(e.target.value)}
             />
           </Form.Field>
-        </Form.Group>
-        <Form.Field>
-          <label>Current value of vehicle?</label>
-          <input
-            type="number"
-            min="0"
-            max="50000"
-            placeholder="Current value"
-            onChange={(e) => setVehCurrentValue(e.target.value)}
-          />
-        </Form.Field>
-        <Form.Field>
-          <label>Date of first registration:</label>
-          <input
-            type="date"
-            onChange={(e) => setVehDateRegistered(e.target.value)}
-          />
-        </Form.Field>
-        <Button type="submit" onClick={handleSubmit}>
-          Submit
-        </Button>
+          <Form.Group widths="equal">
+            <Form.Field>
+              <label>City</label>
+              <Form.Input
+                placeholder="City"
+                onChange={(e) => setCity(e.target.value)}
+                error={
+                  fieldErrors.city ? ErrorMsgConstants.CITY_REQUIRED : false
+                }
+              />
+            </Form.Field>
+            <Form.Field>
+              <label>Postcode</label>
+              <Form.Input
+                placeholder="Postcode"
+                onChange={(e) => setPostcode(e.target.value)}
+                error={
+                  fieldErrors.postcode
+                    ? ErrorMsgConstants.POSTCODE_REQUIRED
+                    : false
+                }
+              />
+            </Form.Field>
+          </Form.Group>
+        </Segment>
+        <Segment color="blue">
+          <Divider horizontal>
+            <b>Vehicle Details</b>
+          </Divider>
+          <Form.Group widths="equal">
+            <Form.Field>
+              <label>Vehicle type</label>
+              <Form.Select
+                placeholder="Please Select"
+                options={DropDownOptions.vehTypeOptions}
+                onChange={(e, { value }) => setVehicleType(value)}
+                value={vehicleType}
+                error={
+                  fieldErrors.vehicleType
+                    ? ErrorMsgConstants.VEHICLE_TYPE_REQUIRED
+                    : false
+                }
+              />
+            </Form.Field>
+            <Form.Field>
+              <label>Engine size</label>
+              <Form.Select
+                placeholder="Please Select"
+                options={DropDownOptions.engSizeOptions}
+                onChange={(e, { value }) => setEngineSize(value)}
+                value={engineSize}
+                error={
+                  fieldErrors.engineSize
+                    ? ErrorMsgConstants.ENGINE_SIZE_REQUIRED
+                    : false
+                }
+              />
+            </Form.Field>
+          </Form.Group>
+          <Form.Field>
+            <label>Additional Drivers</label>
+            <Form.Input
+              type="number"
+              min="0"
+              placeholder="Additional Drivers"
+              onChange={(e) => setAddDrivers(e.target.value)}
+              error={
+                fieldErrors.addDrivers
+                  ? ErrorMsgConstants.ADDITIONAL_DRIVERS_REQUIRED
+                  : false
+              }
+            />
+          </Form.Field>
+          <Form.Field>
+            <label>Will this vehicle be used for commercial purposes?</label>
+          </Form.Field>
+          <Form.Field>
+            <Form.Checkbox
+              toggle
+              label={"Selected value: " + commercialUse}
+              onChange={(e, data) => handleCommercialUseChange(data.checked)}
+            />
+          </Form.Field>
+          <Form.Field>
+            <label>
+              Will this vehicle be used outside the registered state?
+            </label>
+          </Form.Field>
+          <Form.Field>
+            <Form.Checkbox
+              toggle
+              label={"Selected value: " + regStateUse}
+              onChange={(e, data) => handleRegStateUseChange(data.checked)}
+            />
+          </Form.Field>
+          <Form.Group widths="equal">
+            <Form.Field>
+              <label>Current value of vehicle?</label>
+              <Form.Input
+                type="number"
+                min="0"
+                max="50000"
+                placeholder="Current value"
+                onChange={(e) => setVehCurrentValue(e.target.value)}
+                error={
+                  fieldErrors.vehCurrentValue
+                    ? ErrorMsgConstants.CURRENT_VALUE_REQUIRED
+                    : false
+                }
+              />
+            </Form.Field>
+            <Form.Field>
+              <label>Date of first registration:</label>
+              <Form.Input
+                type="date"
+                onChange={(e) => setVehDateRegistered(e.target.value)}
+                error={
+                  fieldErrors.vehDateRegistered
+                    ? ErrorMsgConstants.DATE_REGISTERED_REQUIRED
+                    : false
+                }
+              />
+            </Form.Field>
+          </Form.Group>
+        </Segment>
+        <Segment>
+          <Button fluid basic color="blue" type="submit" onClick={handleSubmit}>
+            <b>Get a Quote!</b>
+          </Button>
+        </Segment>
       </Form>
     </div>
   );

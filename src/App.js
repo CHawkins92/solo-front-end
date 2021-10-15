@@ -8,9 +8,7 @@ function App() {
   return (
     <BrowserRouter>
       <div className="App">
-        <div>
-          <h3>React CRUD</h3>
-        </div>
+        <div></div>
         <div>
           <Route exact path="/" component={Create} />
         </div>
