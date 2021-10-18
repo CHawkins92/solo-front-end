@@ -21,12 +21,17 @@ function Admin() {
       .catch((err) => {
         console.log(err);
       });
+
+    // if (customerData === null) {
+    //   alert("Customer does not exist");
+    // }
   }
 
   function callMockAPIWithAxiosDELETE() {
     const endpointURL =
-      "https://6156de01e039a0001725ac37.mockapi.io/api/vi/customerDetails/" +
-      idToDelete;
+      "http://localhost:8080/customerDetails?id=" + idToDelete;
+    // "https://6156de01e039a0001725ac37.mockapi.io/api/vi/customerDetails/" +
+    // idToDelete;
 
     axios.delete(endpointURL).catch((err) => {
       console.log(err);
@@ -39,8 +44,12 @@ function Admin() {
     };
 
     const endpointURL =
-      "https://6156de01e039a0001725ac37.mockapi.io/api/vi/customerDetails/" +
-      idToUpdate;
+      "http://localhost:8080/customerDetails?id=" +
+      idToUpdate +
+      "&newTelephoneNumber=" +
+      telephoneNumber;
+    // "https://6156de01e039a0001725ac37.mockapi.io/api/vi/customerDetails/" +
+    // idToUpdate;
 
     axios.put(endpointURL, formData).catch((err) => {
       console.log(err);
@@ -102,7 +111,7 @@ function Admin() {
     <div>
       <Form>
         <Form.Group width="equal">
-          <Form.Field>
+          <Form.Field inline>
             <label>View Driver Details</label>
             <input
               placeholder="Enter driver's Id"
@@ -115,7 +124,7 @@ function Admin() {
         </Form.Group>
         {renderDataTable()}
         <Form.Group width="equal">
-          <Form.Field>
+          <Form.Field inline>
             <label>Delete a Driver</label>
             <input
               placeholder="Enter driver's Id"
@@ -127,14 +136,14 @@ function Admin() {
           </Button>
         </Form.Group>
         <Form.Group width="equal">
-          <Form.Field>
+          <Form.Field inline>
             <label>Driver ID</label>
             <input
               placeholder="Enter driver's Id"
               onChange={(e) => setIdToUpdate(e.target.value)}
             />
           </Form.Field>
-          <Form.Field>
+          <Form.Field inline>
             <label>New Telephone Number</label>
             <input
               placeholder="Enter new telephone number"
