@@ -1,13 +1,22 @@
 import React, { useState, useEffect } from "react";
-import { Button, Form, Divider, Segment, Image } from "semantic-ui-react";
+import {
+  Button,
+  Form,
+  Divider,
+  Segment,
+  Image,
+  Icon,
+  Header,
+} from "semantic-ui-react";
 import axios from "axios";
 import * as ErrorMsgConstants from "./ErrorMessages.js";
 import * as DropDownOptions from "./DropdownOptions";
+import * as FieldValidator from "./FormFieldsValidator";
 import logo from "./allstate_logo.jpg";
 
 function Create() {
   // Properties mapping to form fields
-  const [prefix, setPrefix] = useState();
+  const [prefix, setPrefix] = useState("");
   const [firstName, setFirstName] = useState("");
   const [lastName, setLastName] = useState("");
   const [telephoneNumber, setTelephoneNumber] = useState("");
@@ -23,26 +32,93 @@ function Create() {
   const [vehCurrentValue, setVehCurrentValue] = useState("");
   const [vehDateRegistered, setVehDateRegistered] = useState("");
 
+  // Fields that will require validation
+  const [fieldsRequiringValidation, setFieldsRequiringValidation] = useState({
+    prefix: "",
+    firstName: "",
+    lastName: "",
+    telephoneNumber: "",
+    addressLine1: "",
+    city: "",
+    postcode: "",
+    vehicleType: "",
+    engineSize: "",
+    addDrivers: "",
+    vehCurrentValue: "",
+    vehDateRegistered: "",
+  });
+
   // Field error status, all initialized false
   const [fieldErrors, setFieldErrors] = useState({
-    prefix: false,
-    firstName: false,
-    lastName: false,
+    prefix: {
+      missing: false,
+    },
+    firstName: {
+      missing: false,
+    },
+    lastName: {
+      missing: false,
+    },
     telephoneNumber: {
       missing: false,
       invalid: false,
     },
-    addressLine1: false,
-    city: false,
-    postcode: false,
-    vehicleType: false,
-    engineSize: false,
-    addDrivers: false,
-    commercialUse: false,
-    regStateUse: false,
-    vehCurrentValue: false,
-    vehDateRegistered: false,
+    addressLine1: {
+      missing: false,
+    },
+    city: {
+      missing: false,
+    },
+    postcode: {
+      missing: false,
+      invalid: false,
+    },
+    vehicleType: {
+      missing: false,
+    },
+    engineSize: {
+      missing: false,
+    },
+    addDrivers: {
+      missing: false,
+    },
+    vehCurrentValue: {
+      missing: false,
+    },
+    vehDateRegistered: {
+      missing: false,
+      invalid: false,
+    },
   });
+
+  useEffect(() => {
+    fieldsRequiringValidation.prefix = prefix;
+    fieldsRequiringValidation.firstName = firstName;
+    fieldsRequiringValidation.lastName = lastName;
+    fieldsRequiringValidation.telephoneNumber = telephoneNumber;
+    fieldsRequiringValidation.addressLine1 = addressLine1;
+    fieldsRequiringValidation.city = city;
+    fieldsRequiringValidation.postcode = postcode;
+    fieldsRequiringValidation.vehicleType = vehicleType;
+    fieldsRequiringValidation.engineSize = engineSize;
+    fieldsRequiringValidation.addDrivers = addDrivers;
+    fieldsRequiringValidation.vehCurrentValue = vehCurrentValue;
+    fieldsRequiringValidation.vehDateRegistered = vehDateRegistered;
+    setFieldsRequiringValidation({ ...fieldsRequiringValidation });
+  }, [
+    prefix,
+    firstName,
+    lastName,
+    telephoneNumber,
+    addressLine1,
+    city,
+    postcode,
+    vehicleType,
+    engineSize,
+    addDrivers,
+    vehCurrentValue,
+    vehDateRegistered,
+  ]);
 
   const callMockAPI = () => {
     const formData = {
@@ -75,198 +151,30 @@ function Create() {
   const handleSubmit = (event) => {
     event.preventDefault();
 
-    let formValidFlag = true;
+    setFieldErrors({
+      ...FieldValidator.validateForm(fieldsRequiringValidation, fieldErrors),
+    });
 
-    formValidFlag = validatePrefix(prefix);
-    formValidFlag = validateFirstName(firstName);
-    formValidFlag = validateLastName(lastName);
-    formValidFlag = validateTelephoneNumber(telephoneNumber);
-    formValidFlag = validateAddressLine1(addressLine1);
-    formValidFlag = validateCity(city);
-    formValidFlag = validatePostcode(postcode);
-    formValidFlag = validateVehicleType(vehicleType);
-    formValidFlag = validateEngineSize(engineSize);
-    formValidFlag = validateAdditionalDrivers(addDrivers);
-    formValidFlag = validateVehicleCurrentValue(vehCurrentValue);
-    formValidFlag = validateDateRegistered(vehDateRegistered);
+    let errFlag = false;
 
-    if (formValidFlag) {
-      callMockAPI();
+    // Check if any fields contain errors
+    for (let fieldName in fieldErrors) {
+      for (let errorType in fieldErrors[fieldName]) {
+        // errorType = missing, invalid
+        if (fieldErrors[fieldName][errorType]) {
+          // true = error with field
+          errFlag = true;
+          break;
+        }
+      }
+    }
+
+    if (errFlag) {
+      console.log("Errors present");
     } else {
-      alert("Errors present");
+      console.log("no errors");
+      callMockAPI();
     }
-  };
-
-  const validatePrefix = (prefix) => {
-    if (prefix === "" || prefix === null || prefix === undefined) {
-      fieldErrors.prefix = true;
-      setFieldErrors({ ...fieldErrors });
-      return false;
-    }
-
-    fieldErrors.prefix = false;
-    setFieldErrors({ ...fieldErrors });
-    return true;
-  };
-
-  const validateFirstName = (firstName) => {
-    if (firstName === "" || firstName === null || firstName === undefined) {
-      fieldErrors.firstName = true;
-      setFieldErrors({ ...fieldErrors });
-      return false;
-    }
-
-    fieldErrors.firstName = false;
-    setFieldErrors({ ...fieldErrors });
-    return true;
-  };
-
-  const validateLastName = (lastName) => {
-    if (lastName === "" || lastName === null || lastName === undefined) {
-      fieldErrors.lastName = true;
-      setFieldErrors({ ...fieldErrors });
-      return false;
-    }
-
-    fieldErrors.lastName = false;
-    setFieldErrors({ ...fieldErrors });
-    return true;
-  };
-
-  const validateTelephoneNumber = (telephoneNumber) => {
-    if (
-      telephoneNumber === "" ||
-      telephoneNumber === null ||
-      telephoneNumber === undefined
-    ) {
-      fieldErrors.telephoneNumber.missing = true;
-      setFieldErrors({ ...fieldErrors });
-      return false;
-    }
-
-    if (telephoneNumber.length < 10) {
-      fieldErrors.telephoneNumber.missing = false;
-      fieldErrors.telephoneNumber.invalid = true;
-      setFieldErrors({ ...fieldErrors });
-      return false;
-    }
-
-    fieldErrors.telephoneNumber.missing = false;
-    fieldErrors.telephoneNumber.invalid = false;
-    setFieldErrors({ ...fieldErrors });
-    return true;
-  };
-
-  const validateAddressLine1 = (addressLine1) => {
-    if (
-      addressLine1 === "" ||
-      addressLine1 === null ||
-      addressLine1 === undefined
-    ) {
-      fieldErrors.addressLine1 = true;
-      setFieldErrors({ ...fieldErrors });
-      return false;
-    }
-
-    fieldErrors.addressLine1 = false;
-    setFieldErrors({ ...fieldErrors });
-    return true;
-  };
-
-  const validateCity = (city) => {
-    if (city === "" || city === null || city === undefined) {
-      fieldErrors.city = true;
-      setFieldErrors({ ...fieldErrors });
-      return false;
-    }
-
-    fieldErrors.city = false;
-    setFieldErrors({ ...fieldErrors });
-    return true;
-  };
-
-  const validatePostcode = (postcode) => {
-    if (postcode === "" || postcode === null || postcode === undefined) {
-      fieldErrors.postcode = true;
-      setFieldErrors({ ...fieldErrors });
-      return false;
-    }
-
-    fieldErrors.postcode = false;
-    setFieldErrors({ ...fieldErrors });
-    return true;
-  };
-
-  const validateVehicleType = (vehicleType) => {
-    if (
-      vehicleType === "" ||
-      vehicleType === null ||
-      vehicleType === undefined
-    ) {
-      fieldErrors.vehicleType = true;
-      setFieldErrors({ ...fieldErrors });
-      return false;
-    }
-
-    fieldErrors.vehicleType = false;
-    setFieldErrors({ ...fieldErrors });
-    return true;
-  };
-
-  const validateEngineSize = (engineSize) => {
-    if (engineSize === "" || engineSize === null || engineSize === undefined) {
-      fieldErrors.engineSize = true;
-      setFieldErrors({ ...fieldErrors });
-      return false;
-    }
-
-    fieldErrors.engineSize = false;
-    setFieldErrors({ ...fieldErrors });
-    return true;
-  };
-
-  const validateAdditionalDrivers = (addDrivers) => {
-    if (addDrivers === "" || addDrivers === null || addDrivers === undefined) {
-      fieldErrors.addDrivers = true;
-      setFieldErrors({ ...fieldErrors });
-      return false;
-    }
-
-    fieldErrors.addDrivers = false;
-    setFieldErrors({ ...fieldErrors });
-    return true;
-  };
-
-  const validateVehicleCurrentValue = (vehCurrentValue) => {
-    if (
-      vehCurrentValue === "" ||
-      vehCurrentValue === null ||
-      vehCurrentValue === undefined
-    ) {
-      fieldErrors.vehCurrentValue = true;
-      setFieldErrors({ ...fieldErrors });
-      return false;
-    }
-
-    fieldErrors.vehCurrentValue = false;
-    setFieldErrors({ ...fieldErrors });
-    return true;
-  };
-
-  const validateDateRegistered = (vehDateRegistered) => {
-    if (
-      vehDateRegistered === "" ||
-      vehDateRegistered === null ||
-      vehDateRegistered === undefined
-    ) {
-      fieldErrors.vehDateRegistered = true;
-      setFieldErrors({ ...fieldErrors });
-      return false;
-    }
-
-    fieldErrors.vehDateRegistered = false;
-    setFieldErrors({ ...fieldErrors });
-    return true;
   };
 
   const handleCommercialUseChange = (value) => {
@@ -288,13 +196,13 @@ function Create() {
   return (
     <div>
       <Form className="main-form">
-        {/* <div>
-          <Image src={logo} className="center" />
-        </div> */}
         <Segment color="blue">
           <Image src={logo} style={{ width: "960px", height: "300px" }} />
           <Divider horizontal>
-            <b>Your Details</b>
+            <Header as="h4" color="blue">
+              <Icon name="address book" color="blue" />
+              Your Details
+            </Header>
           </Divider>
           <Form.Group widths="equal">
             <Form.Field>
@@ -305,7 +213,9 @@ function Create() {
                 onChange={(e, { value }) => setPrefix(value)}
                 value={prefix}
                 error={
-                  fieldErrors.prefix ? ErrorMsgConstants.PREFIX_REQUIRED : false
+                  fieldErrors.prefix.missing
+                    ? ErrorMsgConstants.PREFIX_REQUIRED
+                    : false
                 }
               />
             </Form.Field>
@@ -315,7 +225,7 @@ function Create() {
                 placeholder="First Name"
                 onChange={(e) => setFirstName(e.target.value)}
                 error={
-                  fieldErrors.firstName
+                  fieldErrors.firstName.missing
                     ? ErrorMsgConstants.FIRST_NAME_REQUIRED
                     : false
                 }
@@ -327,7 +237,7 @@ function Create() {
                 placeholder="Last Name"
                 onChange={(e) => setLastName(e.target.value)}
                 error={
-                  fieldErrors.lastName
+                  fieldErrors.lastName.missing
                     ? ErrorMsgConstants.LAST_NAME_REQUIRED
                     : false
                 }
@@ -354,7 +264,7 @@ function Create() {
               placeholder="Address Line 1"
               onChange={(e) => setAddressLine1(e.target.value)}
               error={
-                fieldErrors.addressLine1
+                fieldErrors.addressLine1.missing
                   ? ErrorMsgConstants.ADDRESS_LINE_1_REQUIRED
                   : false
               }
@@ -374,18 +284,22 @@ function Create() {
                 placeholder="City"
                 onChange={(e) => setCity(e.target.value)}
                 error={
-                  fieldErrors.city ? ErrorMsgConstants.CITY_REQUIRED : false
+                  fieldErrors.city.missing
+                    ? ErrorMsgConstants.CITY_REQUIRED
+                    : false
                 }
               />
             </Form.Field>
             <Form.Field>
               <label>Postcode</label>
               <Form.Input
-                placeholder="Postcode"
+                placeholder="E.g BT99 7AG"
                 onChange={(e) => setPostcode(e.target.value)}
                 error={
-                  fieldErrors.postcode
+                  fieldErrors.postcode.missing
                     ? ErrorMsgConstants.POSTCODE_REQUIRED
+                    : fieldErrors.postcode.invalid
+                    ? ErrorMsgConstants.POSTCODE_INVALID
                     : false
                 }
               />
@@ -394,7 +308,10 @@ function Create() {
         </Segment>
         <Segment color="blue">
           <Divider horizontal>
-            <b>Vehicle Details</b>
+            <Header as="h4" color="blue">
+              <Icon name="car" color="blue" />
+              Vehicle Details
+            </Header>
           </Divider>
           <Form.Group widths="equal">
             <Form.Field>
@@ -405,7 +322,7 @@ function Create() {
                 onChange={(e, { value }) => setVehicleType(value)}
                 value={vehicleType}
                 error={
-                  fieldErrors.vehicleType
+                  fieldErrors.vehicleType.missing
                     ? ErrorMsgConstants.VEHICLE_TYPE_REQUIRED
                     : false
                 }
@@ -419,7 +336,7 @@ function Create() {
                 onChange={(e, { value }) => setEngineSize(value)}
                 value={engineSize}
                 error={
-                  fieldErrors.engineSize
+                  fieldErrors.engineSize.missing
                     ? ErrorMsgConstants.ENGINE_SIZE_REQUIRED
                     : false
                 }
@@ -434,34 +351,32 @@ function Create() {
               placeholder="Additional Drivers"
               onChange={(e) => setAddDrivers(e.target.value)}
               error={
-                fieldErrors.addDrivers
+                fieldErrors.addDrivers.missing
                   ? ErrorMsgConstants.ADDITIONAL_DRIVERS_REQUIRED
                   : false
               }
             />
           </Form.Field>
-          <Form.Field>
-            <label>Will this vehicle be used for commercial purposes?</label>
-          </Form.Field>
-          <Form.Field>
-            <Form.Checkbox
-              toggle
-              label={"Selected value: " + commercialUse}
-              onChange={(e, data) => handleCommercialUseChange(data.checked)}
-            />
-          </Form.Field>
-          <Form.Field>
-            <label>
-              Will this vehicle be used outside the registered state?
-            </label>
-          </Form.Field>
-          <Form.Field>
-            <Form.Checkbox
-              toggle
-              label={"Selected value: " + regStateUse}
-              onChange={(e, data) => handleRegStateUseChange(data.checked)}
-            />
-          </Form.Field>
+          <Form.Group widths="equal">
+            <Form.Field>
+              <label>Will this vehicle be used for commercial purposes?</label>
+              <Form.Checkbox
+                toggle
+                label={"Selected value: " + commercialUse}
+                onChange={(e, data) => handleCommercialUseChange(data.checked)}
+              />
+            </Form.Field>
+            <Form.Field>
+              <label>
+                Will this vehicle be used outside the registered state?
+              </label>
+              <Form.Checkbox
+                toggle
+                label={"Selected value: " + regStateUse}
+                onChange={(e, data) => handleRegStateUseChange(data.checked)}
+              />
+            </Form.Field>
+          </Form.Group>
           <Form.Group widths="equal">
             <Form.Field>
               <label>Current value of vehicle?</label>
@@ -472,7 +387,7 @@ function Create() {
                 placeholder="Current value"
                 onChange={(e) => setVehCurrentValue(e.target.value)}
                 error={
-                  fieldErrors.vehCurrentValue
+                  fieldErrors.vehCurrentValue.missing
                     ? ErrorMsgConstants.CURRENT_VALUE_REQUIRED
                     : false
                 }
@@ -484,8 +399,10 @@ function Create() {
                 type="date"
                 onChange={(e) => setVehDateRegistered(e.target.value)}
                 error={
-                  fieldErrors.vehDateRegistered
+                  fieldErrors.vehDateRegistered.missing
                     ? ErrorMsgConstants.DATE_REGISTERED_REQUIRED
+                    : fieldErrors.vehDateRegistered.invalid
+                    ? ErrorMsgConstants.DATE_REGISTERED_INVALID
                     : false
                 }
               />
