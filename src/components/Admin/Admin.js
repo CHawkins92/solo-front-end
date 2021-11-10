@@ -12,7 +12,7 @@ import {
   Image,
 } from "semantic-ui-react";
 import axios from "axios";
-import logo from "./allstate_logo.jpg";
+import logo from "../../assets/images/allstate_logo.jpg";
 
 function Admin() {
   const [idToGet, setIdToGet] = useState(null);
@@ -211,7 +211,7 @@ function Admin() {
   return (
     <div>
       <Form>
-        <Image src={logo} style={{ width: "1200px", height: "300px" }} />
+        <Image className="allstate-img-admin" src={logo} />
         <Divider horizontal>
           <Header as="h4" color="blue">
             <Icon name="address book" color="blue" />

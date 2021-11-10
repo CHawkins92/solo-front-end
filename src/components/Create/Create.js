@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import "./Create.css";
 import {
   Button,
   Form,
@@ -12,7 +13,7 @@ import axios from "axios";
 import * as ErrorMsgConstants from "./ErrorMessages.js";
 import * as DropDownOptions from "./DropdownOptions";
 import * as FieldValidator from "./FormFieldsValidator";
-import logo from "./allstate_logo.jpg";
+import logo from "../../assets/images/allstate_logo.jpg";
 
 function Create() {
   // Properties mapping to form fields
@@ -195,9 +196,9 @@ function Create() {
 
   return (
     <div>
-      <Form className="main-form">
+      <Form>
         <Segment color="blue">
-          <Image src={logo} style={{ width: "960px", height: "300px" }} />
+          <Image className="allstate-img-create" src={logo} />
           <Divider horizontal>
             <Header as="h4" color="blue">
               <Icon name="address book" color="blue" />
