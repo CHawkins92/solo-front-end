@@ -13,6 +13,7 @@ import {
 } from "semantic-ui-react";
 import axios from "axios";
 import logo from "../../assets/images/allstate_logo.jpg";
+import * as FieldValidator from "./FormFieldsValidator";
 
 function Admin() {
   const [idToGet, setIdToGet] = useState(null);
@@ -21,6 +22,7 @@ function Admin() {
   const [telephoneNumber, setTelephoneNumber] = useState(null);
   const [customerData, setCustomerData] = useState(null);
 
+  // Field error status, all initialized false. true indicates error is present in field
   const [fieldErrors, setFieldErrors] = useState({
     idToGet: {
       missing: false,
@@ -40,7 +42,13 @@ function Admin() {
     },
   });
 
-  function callMockAPIWithAxiosGET() {
+
+  /*
+  ==============================
+   API functions
+  ==============================
+  */
+  function callAPIWithAxiosGET(idToGet) {
     const endpointURL = "http://localhost:8080/customerDetails?id=" + idToGet;
 
     axios
@@ -62,11 +70,9 @@ function Admin() {
       });
   }
 
-  function callMockAPIWithAxiosDELETE() {
+  function callAPIWithAxiosDELETE() {
     const endpointURL =
       "http://localhost:8080/customerDetails?id=" + idToDelete;
-    // "https://6156de01e039a0001725ac37.mockapi.io/api/vi/customerDetails/" +
-    // idToDelete;
 
     axios
       .delete(endpointURL)
@@ -82,7 +88,7 @@ function Admin() {
       });
   }
 
-  function callMockAPIWithAxiosPUT() {
+  function callAPIWithAxiosPUT() {
     const formData = {
       telephoneNumber,
     };
@@ -94,12 +100,12 @@ function Admin() {
       telephoneNumber;
 
     // if telephone number is valid call axios
-    if (validateTelephoneNumber(formData.telephoneNumber)) {
+    if (FieldValidator.validateTelephoneNumber(formData.telephoneNumber)) {
       axios
         .put(endpointURL, formData)
         .then((response) => {
           if (response.status === 200 && idToGet === idToUpdate) {
-            callMockAPIWithAxiosGET();
+            callAPIWithAxiosGET();
           }
         })
         .catch((err) => {
@@ -110,7 +116,13 @@ function Admin() {
     }
   }
 
-  const formattedName = () => {
+
+    /*
+  ==============================
+   Helper functions
+  ==============================
+  */
+  const getFormattedName = () => {
     return (
       customerData.prefix +
       " " +
@@ -120,27 +132,11 @@ function Admin() {
     );
   };
 
-  const formattedQuote = () => {
+  const getFormattedQuote = () => {
     return "£ " + customerData.quotedAmount;
   };
 
-  const validateTelephoneNumber = (telephoneNumber) => {
-    var telephoneNumberRegEx = /^[0-9]*$/i;
-    let isTelephoneNumberFormatValid =
-      telephoneNumberRegEx.test(telephoneNumber);
-
-    if (
-      !telephoneNumber ||
-      telephoneNumber.length !== 11 ||
-      !isTelephoneNumberFormatValid
-    ) {
-      return false;
-    } else {
-      return true;
-    }
-  };
-
-  const testDiv = () => {
+  const customerDataTable = () => {
     if (customerData != null) {
       return (
         <Container textAlign="center">
@@ -151,7 +147,7 @@ function Admin() {
                 Customer Details
               </Header>
             </Divider>
-            <p>{formattedName()}</p>
+            <p>{getFormattedName()}</p>
             <p>{customerData.telephoneNumber}</p>
             <p>{customerData.addressLine1}</p>
             <p>{customerData.addressLine2}</p>
@@ -201,7 +197,7 @@ function Admin() {
                 Quoted Amount
               </Header>
             </Divider>
-            <b>{formattedQuote()}</b>
+            <b>{getFormattedQuote()}</b>
           </Segment>
         </Container>
       );
@@ -211,6 +207,7 @@ function Admin() {
   return (
     <div>
       <Form>
+      <Segment color="blue">
         <Image className="allstate-img-admin" src={logo} />
         <Divider horizontal>
           <Header as="h4" color="blue">
@@ -236,12 +233,12 @@ function Admin() {
             basic
             color="green"
             type="submit"
-            onClick={callMockAPIWithAxiosGET}
+            onClick={() => callAPIWithAxiosGET(idToGet)}
           >
             View
           </Button>
         </Form.Group>
-        {testDiv()}
+        {customerDataTable()}
         <div class="ui hidden section divider"></div>
         <Divider horizontal>
           <Header as="h4" color="blue">
@@ -254,13 +251,20 @@ function Admin() {
             <Form.Input
               placeholder="Enter driver's Id"
               onChange={(e) => setIdToDelete(e.target.value)}
+              error={
+                fieldErrors.idToDelete.noMatch
+                  ? "Driver does not exist"
+                  : fieldErrors.idToDelete.missing
+                  ? "Please enter a driver id"
+                  : false
+              }
             />
           </Form.Field>
           <Button
             basic
             color="red"
             type="submit"
-            onClick={callMockAPIWithAxiosDELETE}
+            onClick={callAPIWithAxiosDELETE}
           >
             Delete
           </Button>
@@ -289,11 +293,12 @@ function Admin() {
             basic
             color="yellow"
             type="submit"
-            onClick={callMockAPIWithAxiosPUT}
+            onClick={callAPIWithAxiosPUT}
           >
             Update
           </Button>
         </Form.Group>
+        </Segment>
       </Form>
     </div>
   );

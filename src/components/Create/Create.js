@@ -33,9 +33,9 @@ function Create() {
   const [vehCurrentValue, setVehCurrentValue] = useState("");
   const [vehDateRegistered, setVehDateRegistered] = useState("");
 
-  // Fields that will require validation
+  // Fields that require validation
   const [fieldsRequiringValidation, setFieldsRequiringValidation] = useState({
-    prefix: "",
+    prefix: "", 
     firstName: "",
     lastName: "",
     telephoneNumber: "",
@@ -49,7 +49,7 @@ function Create() {
     vehDateRegistered: "",
   });
 
-  // Field error status, all initialized false
+  // Field error status, all initialized false. true indicates error is present in field
   const [fieldErrors, setFieldErrors] = useState({
     prefix: {
       missing: false,
@@ -92,6 +92,12 @@ function Create() {
     },
   });
 
+
+  /*
+  ==============================
+   useEffects
+  ==============================
+  */
   useEffect(() => {
     fieldsRequiringValidation.prefix = prefix;
     fieldsRequiringValidation.firstName = firstName;
@@ -121,7 +127,13 @@ function Create() {
     vehDateRegistered,
   ]);
 
-  const callMockAPI = () => {
+
+  /*
+  ==============================
+   API functions
+  ==============================
+  */
+  const callAPIWithAxiosPOST = () => {
     const formData = {
       prefix,
       firstName,
@@ -141,7 +153,6 @@ function Create() {
     };
 
     const endpointURL = "http://localhost:8080/customerDetails";
-    //"https://6156de01e039a0001725ac37.mockapi.io/api/vi/customerDetails";
 
     axios
       .post(endpointURL, formData)
@@ -149,6 +160,12 @@ function Create() {
       .catch((err) => console.log(err));
   };
 
+
+  /*
+  ==============================
+   Handler functions
+  ==============================
+  */
   const handleSubmit = (event) => {
     event.preventDefault();
 
@@ -174,7 +191,7 @@ function Create() {
       console.log("Errors present");
     } else {
       console.log("no errors");
-      callMockAPI();
+      callAPIWithAxiosPOST();
     }
   };
 
@@ -193,6 +210,8 @@ function Create() {
       setRegStateUse("No");
     }
   };
+
+
 
   return (
     <div>
