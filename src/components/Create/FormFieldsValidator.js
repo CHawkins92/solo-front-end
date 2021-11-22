@@ -20,6 +20,10 @@ export const validateForm = (fieldsRequiringValidation, fieldErrors) => {
     fieldErrors
   );
 
+  fieldErrors = validateAdditionalDrivers(
+    fieldsRequiringValidation.addDrivers,
+    fieldErrors
+  );
   return fieldErrors;
 };
 
@@ -61,10 +65,23 @@ const validatePostcode = (postcode, fieldErrors) => {
   return fieldErrors;
 };
 
+const validateAdditionalDrivers = (addDrivers, fieldErrors) => {
+  var additionalDriversRegEx = /[.-]/;
+  let isAdditionalDriversValid = additionalDriversRegEx.test(addDrivers);
+
+  if (isAdditionalDriversValid || addDrivers < 0 || addDrivers > 5) {
+    fieldErrors.addDrivers.invalid = true;
+  } else {
+    fieldErrors.addDrivers.invalid = false;
+  }
+
+  return fieldErrors;
+};
+
 const validateVehicleDateRegistered = (registrationDate, fieldErrors) => {
   let year = new Date().getFullYear().toString();
   let month = ("0" + (new Date().getMonth() + 1)).slice(-2);
-  let day = ("0" + new Date().getDay()).slice(-2);
+  let day = ("0" + new Date().getDate()).slice(-2);
 
   let today = parseInt(year + month + day);
 

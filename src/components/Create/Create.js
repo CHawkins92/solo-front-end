@@ -82,9 +82,11 @@ function Create() {
     },
     addDrivers: {
       missing: false,
+      invalid: false,
     },
     vehCurrentValue: {
       missing: false,
+      invalid: false,
     },
     vehDateRegistered: {
       missing: false,
@@ -172,6 +174,8 @@ function Create() {
     setFieldErrors({
       ...FieldValidator.validateForm(fieldsRequiringValidation, fieldErrors),
     });
+
+    console.log(fieldErrors)
 
     let errFlag = false;
 
@@ -368,12 +372,15 @@ function Create() {
             <Form.Input
               type="number"
               min="0"
+              max="5"
               placeholder="Additional Drivers"
               onChange={(e) => setAddDrivers(e.target.value)}
               error={
                 fieldErrors.addDrivers.missing
-                  ? ErrorMsgConstants.ADDITIONAL_DRIVERS_REQUIRED
-                  : false
+                    ? ErrorMsgConstants.ADDITIONAL_DRIVERS_REQUIRED
+                    : fieldErrors.addDrivers.invalid
+                    ? ErrorMsgConstants.ADDITIONAL_DRIVERS_INVALID
+                    : false
               }
             />
           </Form.Field>
